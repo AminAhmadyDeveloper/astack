@@ -9,7 +9,7 @@ import React from 'react';
 
 import { AutoForm, fieldConfig } from '@/components/ui/autoform';
 import { Button } from '@/components/ui/button';
-import { authClient } from '@/lib/auth-client';
+import { client } from '@/lib/jstack-client';
 
 const signInSchema = z.object({
   email: z.string().min(1),
@@ -31,8 +31,11 @@ export const SignInForm = () => {
   const signInMutation = useMutation({
     mutationKey: ['SIGN_IN'],
     mutationFn: async (values: SignInSchema) => {
-      const { data, error } = await authClient.signIn.email(values);
-      if (error) throw error;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const data = await client.auth['sign-in'].email.$post(values as any);
+      console.log(data);
+
+      // if (error) throw error;
       return data;
     },
     onError: ({ message }) => {

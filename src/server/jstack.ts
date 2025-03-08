@@ -1,9 +1,14 @@
+import { neon } from '@neondatabase/serverless';
+import { betterAuth } from 'better-auth';
+import { drizzle } from 'drizzle-orm/neon-http';
 import { HTTPException } from 'hono/http-exception';
+import type { InferMiddlewareOutput } from 'jstack';
 import { jstack } from 'jstack';
 
+import { getBetterAuthConfigs } from '@/configs/better-auth-configs';
 import { auth } from '@/lib/auth-api';
 import type { ENVSchema } from '@/lib/environment-utils';
-import { db } from '@/server/database';
+import * as schema from '@/server/database/schema';
 
 interface Env {
   Bindings: ENVSchema;
@@ -11,8 +16,18 @@ interface Env {
 
 export const j = jstack.init<Env>();
 
-const databaseMiddleware = j.middleware(async ({ next }) => {
+const databaseMiddleware = j.middleware(async ({ next, c }) => {
+  const sql = neon(c.env.DATABASE_URL);
+  const db = drizzle({ client: sql, schema });
+
   return await next({ db });
+});
+
+const betterAuthMiddleware = j.middleware(async ({ next, ctx }) => {
+  const { db } = ctx as InferMiddlewareOutput<typeof databaseMiddleware>;
+  const auth = betterAuth(getBetterAuthConfigs(db));
+
+  return await next({ auth });
 });
 
 const authenticationMiddleware = j.middleware(async ({ next, c }) => {
@@ -24,8 +39,8 @@ const authenticationMiddleware = j.middleware(async ({ next, c }) => {
   return await next({ session });
 });
 
-export const publicProcedure = j.procedure.use(databaseMiddleware);
-
-export const protectedProcedure = j.procedure
+export const publicProcedure = j.procedure
   .use(databaseMiddleware)
-  .use(authenticationMiddleware);
+  .use(betterAuthMiddleware);
+
+export const protectedProcedure = publicProcedure.use(authenticationMiddleware);
