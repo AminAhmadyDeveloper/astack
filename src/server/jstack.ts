@@ -6,7 +6,6 @@ import type { InferMiddlewareOutput } from 'jstack';
 import { jstack } from 'jstack';
 
 import { getBetterAuthConfigs } from '@/configs/better-auth-configs';
-import { auth } from '@/lib/auth-api';
 import type { ENVSchema } from '@/lib/environment-utils';
 import * as schema from '@/server/database/schema';
 
@@ -30,7 +29,8 @@ const betterAuthMiddleware = j.middleware(async ({ next, ctx }) => {
   return await next({ auth });
 });
 
-const authenticationMiddleware = j.middleware(async ({ next, c }) => {
+const authenticationMiddleware = j.middleware(async ({ next, c, ctx }) => {
+  const { auth } = ctx as InferMiddlewareOutput<typeof betterAuthMiddleware>;
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
   if (!session?.session || !session.user)
     throw new HTTPException(401, {

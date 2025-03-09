@@ -2,7 +2,7 @@ import type { NeonQueryFunction } from '@neondatabase/serverless';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import type { NeonHttpDatabase } from 'drizzle-orm/neon-http';
 
-import { getUrl } from '@/lib/environment-utils';
+import { getUrl } from '@/lib/server-utils';
 import * as schema from '@/server/database/schema';
 
 export const getBetterAuthConfigs = (

@@ -1,12 +1,22 @@
+import { cors } from 'hono/cors';
+
 import { j } from '@/server/jstack';
 import { postRouter } from '@/server/routers/post-router';
 
 import { authRouter } from './routers/auth-router';
 
+const appCors = cors({
+  allowHeaders: ['x-is-superjson', 'Content-Type'],
+  exposeHeaders: ['x-is-superjson'],
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  origin: 'http://localhost:3000',
+  credentials: true,
+});
+
 const api = j
   .router()
   .basePath('/api')
-  .use(j.defaults.cors)
+  .use(appCors)
   .onError(j.defaults.errorHandler);
 
 const appRouter = j.mergeRouters(api, {

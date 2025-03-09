@@ -16,52 +16,31 @@ const signInSchema = z.object({
   password: z
     .string()
     .min(1)
-    .superRefine(
-      fieldConfig({
-        inputProps: {
-          type: 'password',
-        },
-      }),
-    ),
+    .superRefine(fieldConfig({ inputProps: { type: 'password' } })),
 });
-
-type SignInSchema = z.infer<typeof signInSchema>;
 
 export const SignInForm = () => {
   const signInMutation = useMutation({
     mutationKey: ['SIGN_IN'],
-    mutationFn: async (values: SignInSchema) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const data = await client.auth['sign-in'].email.$post(values as any);
-      console.log(data);
-
-      // if (error) throw error;
-      return data;
-    },
-    onError: ({ message }) => {
-      toast.error(message);
-    },
-    onSuccess: () => {
-      toast.success('signed in successfully');
-    },
+    mutationFn: client.auth['sign-in'].email.$post,
+    onError: ({ message }) => toast.error(message),
+    onSuccess: () => toast.success('signed in successfully'),
   });
 
   return (
-    <div>
-      <AutoForm
-        schema={new ZodProvider(signInSchema)}
-        onSubmit={(values) => signInMutation.mutate(values)}
+    <AutoForm
+      schema={new ZodProvider(signInSchema)}
+      onSubmit={(values) => signInMutation.mutate(values)}
+    >
+      <Button
+        className="w-full"
+        variant="secondary"
+        size="lg"
+        isLoading={signInMutation.isPending}
+        type="submit"
       >
-        <Button
-          className="w-full"
-          variant="secondary"
-          size="lg"
-          isLoading={signInMutation.isPending}
-          type="submit"
-        >
-          Sign In
-        </Button>
-      </AutoForm>
-    </div>
+        Sign In
+      </Button>
+    </AutoForm>
   );
 };

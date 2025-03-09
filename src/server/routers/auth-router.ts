@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 import { j, publicProcedure } from '@/server/jstack';
 
 const createAuthHandler = (method: 'query' | 'mutation') =>
@@ -9,13 +11,12 @@ export const authRouter = j.router({
   'list-sessions': createAuthHandler('query'),
 
   // Authentication
-  'sign-in/email': publicProcedure.mutation(async ({ c, ctx }) => {
-    const body = await c.req.json();
-    console.log(body);
-
-    const response = await ctx.auth.api.signInEmail(body);
-    return c.superjson(await response.json());
-  }),
+  'sign-in/email': publicProcedure
+    .input(z.object({ email: z.string().email(), password: z.string() }))
+    .mutation(async ({ c, ctx, input: body }) => {
+      const response = await ctx.auth.api.signInEmail({ body });
+      return c.superjson(response);
+    }),
   'sign-in/social': createAuthHandler('mutation'),
   'sign-up/email': createAuthHandler('mutation'),
   'sign-out': createAuthHandler('mutation'),
