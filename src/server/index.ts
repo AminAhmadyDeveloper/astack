@@ -9,7 +9,7 @@ const appCors = cors({
   allowHeaders: ['x-is-superjson', 'Content-Type'],
   exposeHeaders: ['x-is-superjson'],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  origin: 'http://localhost:3000',
+  origin: ['http://localhost:3000', 'https://astack.vercel.app/'],
   credentials: true,
 });
 
