@@ -5,3 +5,7 @@ main = "src/server/index.ts"
 
 [dev]
 port = 8080
+
+[observability]
+enabled = true
+head_sampling_rate = 1
