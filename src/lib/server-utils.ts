@@ -10,7 +10,7 @@ export const getUrl = (suffix?: string[]) => {
 export const getWorkerUrl = (suffix?: string[]) => {
   const base = (() => {
     if (process.env.NODE_ENV === 'production') {
-      return 'astack.aminahmadydeveloper.workers.dev';
+      return 'astack.aminahmadydeveloper.workers.dev/api';
     }
     return 'http://localhost:8080/api';
   })();

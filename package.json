@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "wrangler": "wrangler dev",
+    "deploy": "wrangler deploy",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
